@@ -1,5 +1,3 @@
-# backend/routes/visits.py
-
 from flask import Blueprint, request, jsonify
 from models.visit import Visit, db
 from utils.validators import validate_date
