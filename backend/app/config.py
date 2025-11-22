@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-
+import pymysql
 # Load environment variables
 load_dotenv()
 
@@ -28,7 +28,6 @@ class Config:
     @staticmethod
     def get_db_connection():
         """Create and return database connection"""
-        import pymysql
         return pymysql.connect(
             host=Config.DB_HOST,
             port=Config.DB_PORT,

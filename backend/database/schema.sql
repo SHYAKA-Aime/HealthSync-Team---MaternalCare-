@@ -77,14 +77,14 @@ CREATE TABLE children (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (mother_id) REFERENCES mothers(mother_id) ON DELETE CASCADE
 );
-
--- Visits Table
+--  Visits table
 CREATE TABLE visits (
     visit_id INT PRIMARY KEY AUTO_INCREMENT,
     mother_id INT NOT NULL,
     hw_id INT,
     visit_date DATE NOT NULL,
     visit_type ENUM('antenatal', 'postnatal', 'general') NOT NULL,
+    status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
     weight DECIMAL(5,2),
     blood_pressure VARCHAR(20),
     notes TEXT,
@@ -125,38 +125,38 @@ CREATE INDEX idx_vaccination_date ON vaccinations(date_given);
 
 -- Insert sample data for testing
 
--- Sample clinic
-INSERT INTO clinics (name, location, contact) VALUES
-('Kigali Health Center', 'Kigali, Gasabo District', '+250788123456');
+-- -- Sample clinic
+-- INSERT INTO clinics (name, location, contact) VALUES
+-- ('Kigali Health Center', 'Kigali, Gasabo District', '+250788123456');
 
--- Sample users
-INSERT INTO users (full_name, email, phone, password_hash, role) VALUES
-('Jane Doe', 'jane@example.com', '+250788111111', '$2b$12$sample_hash_will_be_replaced', 'mother'),
-('Dr. John Smith', 'doctor@example.com', '+250788222222', '$2b$12$sample_hash_will_be_replaced', 'health_worker'),
-('Admin User', 'admin@example.com', '+250788333333', '$2b$12$sample_hash_will_be_replaced', 'admin');
+-- -- Sample users
+-- INSERT INTO users (full_name, email, phone, password_hash, role) VALUES
+-- ('Jane Doe', 'jane@example.com', '+250788111111', '$2b$12$sample_hash_will_be_replaced', 'mother'),
+-- ('Dr. John Smith', 'doctor@example.com', '+250788222222', '$2b$12$sample_hash_will_be_replaced', 'health_worker'),
+-- ('Admin User', 'admin@example.com', '+250788333333', '$2b$12$sample_hash_will_be_replaced', 'admin');
 
--- Sample health worker
-INSERT INTO health_workers (user_id, clinic_id, position, department) VALUES
-(2, 1, 'Nurse', 'Maternal Health');
+-- -- Sample health worker
+-- INSERT INTO health_workers (user_id, clinic_id, position, department) VALUES
+-- (2, 1, 'Nurse', 'Maternal Health');
 
--- Sample mother
-INSERT INTO mothers (user_id, age, blood_group, pregnancy_stage, expected_delivery, location, emergency_contact) VALUES
-(1, 28, 'O+', 'Second Trimester', '2025-06-15', 'Kigali, Gasabo', '+250788444444');
+-- -- Sample mother
+-- INSERT INTO mothers (user_id, age, blood_group, pregnancy_stage, expected_delivery, location, emergency_contact) VALUES
+-- (1, 28, 'O+', 'Second Trimester', '2025-06-15', 'Kigali, Gasabo', '+250788444444');
 
--- Sample child
-INSERT INTO children (mother_id, full_name, dob, gender, birth_weight, birth_height) VALUES
-(1, 'Baby Doe', '2024-01-15', 'female', 3.2, 48.5);
+-- -- Sample child
+-- INSERT INTO children (mother_id, full_name, dob, gender, birth_weight, birth_height) VALUES
+-- (1, 'Baby Doe', '2024-01-15', 'female', 3.2, 48.5);
 
--- Sample visit
-INSERT INTO visits (mother_id, hw_id, visit_date, visit_type, weight, blood_pressure, notes) VALUES
-(1, 1, '2025-01-15', 'antenatal', 65.5, '120/80', 'Regular checkup - all vital signs normal');
+-- -- Sample visit
+-- INSERT INTO visits (mother_id, hw_id, visit_date, visit_type, weight, blood_pressure, notes) VALUES
+-- (1, 1, '2025-01-15', 'antenatal', 65.5, '120/80', 'Regular checkup - all vital signs normal');
 
--- Sample vaccination
-INSERT INTO vaccinations (child_id, hw_id, vaccine_name, date_given, next_due_date, administered_by, batch_number) VALUES
-(1, 1, 'BCG', '2024-01-16', NULL, 'Dr. John Smith', 'BCG2024-001');
+-- -- Sample vaccination
+-- INSERT INTO vaccinations (child_id, hw_id, vaccine_name, date_given, next_due_date, administered_by, batch_number) VALUES
+-- (1, 1, 'BCG', '2024-01-16', NULL, 'Dr. John Smith', 'BCG2024-001');
 
--- Verification queries
-SELECT 'Database setup complete!' as status;
-SELECT COUNT(*) as total_users FROM users;
-SELECT COUNT(*) as total_mothers FROM mothers;
-SELECT COUNT(*) as total_children FROM children;
+-- -- Verification queries
+-- SELECT 'Database setup complete!' as status;
+-- SELECT COUNT(*) as total_users FROM users;
+-- SELECT COUNT(*) as total_mothers FROM mothers;
+-- SELECT COUNT(*) as total_children FROM children;
