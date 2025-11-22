@@ -2,12 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom base styles */
 @layer base {
+  :root {
+    --border: 240 5% 84%;
+    --input: 240 5% 84%;
+    --ring: 240 5% 64%;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+  }
+
+  .dark {
+    --border: 240 5% 26%;
+    --input: 240 5% 26%;
+    --ring: 240 5% 64%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 100%;
+  }
+
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-gray-50 text-gray-900;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -26,7 +41,6 @@
   }
 }
 
-/* Custom component styles */
 @layer components {
   .btn {
     @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
@@ -61,7 +75,6 @@
   }
 }
 
-/* Custom utilities */
 @layer utilities {
   .text-balance {
     text-wrap: balance;

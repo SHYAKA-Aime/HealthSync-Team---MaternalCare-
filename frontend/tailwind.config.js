@@ -31,6 +31,14 @@ export default {
           800: '#9d174d',
           900: '#831843',
         },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+      },
+      borderColor: {
+        DEFAULT: "hsl(var(--border))",
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
