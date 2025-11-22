@@ -1,3 +1,5 @@
+# backend/models/visit.py
+
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
