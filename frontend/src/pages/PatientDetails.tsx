@@ -195,9 +195,12 @@ const PatientDetails = () => {
                       return (
                         <div
                           key={child.child_id}
-                          className="flex items-center justify-between border border-gray-200 rounded-lg p-3"
+                          className="flex items-center justify-between border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
+                          <Link
+                            to={`/child/${child.child_id}`}
+                            className="flex items-center gap-3 flex-1"
+                          >
                             <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold text-sm">
                               {child.full_name
                                 .split(" ")
@@ -205,7 +208,7 @@ const PatientDetails = () => {
                                 .join("")}
                             </div>
                             <div>
-                              <h3 className="font-semibold text-gray-900">
+                              <h3 className="font-semibold text-gray-900 hover:text-blue-600">
                                 {child.full_name}
                               </h3>
                               <p className="text-sm text-gray-600">
@@ -215,7 +218,7 @@ const PatientDetails = () => {
                                 • {child.gender}
                               </p>
                             </div>
-                          </div>
+                          </Link>
                           <Button
                             onClick={() =>
                               navigate(

@@ -19,13 +19,33 @@ export const authService = {
     return response.data;
   },
 
-  async login(email: string, password: string) {
-    const response = await api.post('/auth/login', { email, password });
-    if (response.data.success) {
-      saveToken(response.data.token);
-      saveUser(response.data.user);
+  async login(identifier: string, password: string) {
+    try {
+      // Clear any existing tokens first to prevent auth state issues
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Determine if identifier is email or phone
+      const isEmail = identifier.includes('@');
+      const loginData = isEmail 
+        ? { email: identifier, password }
+        : { phone: identifier, password };
+      
+      const response = await api.post('/auth/login', loginData);
+      
+      if (response.data.success) {
+        saveToken(response.data.token);
+        saveUser(response.data.user);
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      // Make sure tokens stay cleared on error
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Re-throw the error so the Login component can handle it
+      throw error;
     }
-    return response.data;
   },
 
   logout() {

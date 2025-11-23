@@ -104,14 +104,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Shared Route - Both mother and health_worker can access */}
         <Route
           path="/child/:id"
           element={
-            <ProtectedRoute allowedRoles={["mother"]}>
+            <ProtectedRoute allowedRoles={["mother", "health_worker"]}>
               <ChildProfile />
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/my-appointments"
           element={

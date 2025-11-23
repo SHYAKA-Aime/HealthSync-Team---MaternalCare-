@@ -7,8 +7,10 @@ import Loader from "../components/Loader";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [loginType, setLoginType] = useState<"email" | "phone">("email");
   const [formData, setFormData] = useState({
     email: "",
+    phone: "",
     password: "",
     rememberMe: false,
   });
@@ -17,30 +19,56 @@ const Login = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+
+    // Clear any previous errors
     setError("");
     setLoading(true);
 
     try {
-      const response = await authService.login(
-        formData.email,
-        formData.password
-      );
+      // Validate input before submission
+      const identifier =
+        loginType === "email" ? formData.email.trim() : formData.phone.trim();
+
+      if (!identifier) {
+        setError(
+          `Please enter your ${
+            loginType === "email" ? "email" : "phone number"
+          }`
+        );
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.password) {
+        setError("Please enter your password");
+        setLoading(false);
+        return;
+      }
+
+      const response = await authService.login(identifier, formData.password);
 
       if (response.success) {
+        // Small delay to ensure token is saved before navigation
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         // Navigate based on user role
         if (response.user.role === "mother") {
-          navigate("/mother-dashboard");
+          navigate("/mother-dashboard", { replace: true });
         } else if (response.user.role === "health_worker") {
-          navigate("/worker-dashboard");
+          navigate("/worker-dashboard", { replace: true });
         } else {
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         }
+      } else {
+        setError(response.message || "Login failed. Please try again.");
+        setLoading(false);
       }
     } catch (err: any) {
+      console.error("Login error:", err);
       setError(
         err.response?.data?.message || "Login failed. Please try again."
       );
-    } finally {
       setLoading(false);
     }
   };
@@ -88,21 +116,66 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <Input
-                type="email"
-                placeholder="email@example.com"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                required
-                disabled={loading}
-              />
+            {/* Login Type Toggle */}
+            <div className="flex gap-2 p-1 bg-gray-200 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setLoginType("email")}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  loginType === "email"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                Email
+              </button>
+              <button
+                type="button"
+                onClick={() => setLoginType("phone")}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  loginType === "phone"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                Phone
+              </button>
             </div>
+
+            {/* Conditional Input Field */}
+            {loginType === "email" ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <Input
+                  type="email"
+                  placeholder="email@example.com"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  required
+                  disabled={loading}
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <Input
+                  type="tel"
+                  placeholder="+250 XXX XXX XXX"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                  required
+                  disabled={loading}
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -140,13 +213,13 @@ const Login = () => {
               </Link>
             </div>
 
-            <Button
+            <button
               type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? <Loader /> : "Sign In"}
-            </Button>
+            </button>
           </form>
 
           <p className="mt-8 text-center text-sm text-gray-600">
