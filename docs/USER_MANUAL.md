@@ -6,7 +6,7 @@ A comprehensive maternal and child health tracking system designed for healthcar
 
 - **Frontend:** [https://maternalcare-sooty.vercel.app/](https://maternalcare-sooty.vercel.app/)
 - **Backend API:** [https://maternalcare.onrender.com](https://maternalcare.onrender.com)
-- **Demo Video:** [View Demo](https://youtu.be/your-demo-video-link)
+- **Demo Video:** [View Demo](https://youtu.be/vuieEGZi7c4)
 
 ## Features
 
@@ -312,9 +312,9 @@ npm run test
 
 ## Team
 
-- **Jotham Rutijana Jabo** - Team Lead / Full Stack Developer
+- **Aime SHYAKA** - Team Lead / Full Stack Developer
 - **Ndunge Mutheu Mbithi** - Backend Developer
 - **Rwema Christian Gashumba** - Database Engineer / Backend Developer
 - **Golbert Gautier Kamanzi** - Backend Developer
 - **Nazira Umucyo** - Frontend Lead Developer
-- **Aime SHYAKA** - Full Stack Developer
+- **Jotham Rutijana Jabo** - Full Stack Developer
