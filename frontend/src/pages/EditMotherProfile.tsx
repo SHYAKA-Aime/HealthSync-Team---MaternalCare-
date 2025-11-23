@@ -32,6 +32,25 @@ const EditMotherProfile = () => {
     }
   }, [id]);
 
+  // Helper function to convert date to YYYY-MM-DD format
+  const formatDateForInput = (dateString: string | null): string => {
+    if (!dateString) return "";
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "";
+
+      // Format to YYYY-MM-DD
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      return "";
+    }
+  };
+
   const fetchMotherProfile = async () => {
     try {
       setLoading(true);
@@ -41,7 +60,7 @@ const EditMotherProfile = () => {
         age: mother.age?.toString() || "",
         blood_group: mother.blood_group || "",
         pregnancy_stage: mother.pregnancy_stage || "",
-        expected_delivery: mother.expected_delivery || "",
+        expected_delivery: formatDateForInput(mother.expected_delivery),
         location: mother.location || "",
         medical_conditions: mother.medical_conditions || "",
         emergency_contact: mother.emergency_contact || "",
@@ -62,15 +81,20 @@ const EditMotherProfile = () => {
 
     try {
       if (motherData) {
-        await motherService.updateMother(motherData.mother_id, {
+        // Prepare data with proper formatting
+        // CRITICAL: Convert empty strings to null for optional fields
+        const updateData: any = {
           age: formData.age ? parseInt(formData.age) : undefined,
-          blood_group: formData.blood_group,
-          pregnancy_stage: formData.pregnancy_stage,
-          expected_delivery: formData.expected_delivery,
-          location: formData.location,
-          medical_conditions: formData.medical_conditions,
-          emergency_contact: formData.emergency_contact,
-        });
+          blood_group: formData.blood_group.trim() || null,
+          pregnancy_stage: formData.pregnancy_stage.trim() || null,
+          expected_delivery: formData.expected_delivery.trim() || null, // Empty string becomes null
+          location: formData.location.trim() || null,
+          medical_conditions: formData.medical_conditions.trim() || null,
+          emergency_contact: formData.emergency_contact.trim() || null,
+        };
+
+        await motherService.updateMother(motherData.mother_id, updateData);
+
         setSuccess("Profile updated successfully!");
         setTimeout(() => navigate(`/patient/${motherData.mother_id}`), 2000);
       } else {
@@ -211,9 +235,8 @@ const EditMotherProfile = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Pregnancy Stage
                       </label>
-                      <Input
-                        type="text"
-                        placeholder="e.g., Second Trimester"
+                      <select
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={formData.pregnancy_stage}
                         onChange={(e) =>
                           setFormData({
@@ -221,7 +244,18 @@ const EditMotherProfile = () => {
                             pregnancy_stage: e.target.value,
                           })
                         }
-                      />
+                      >
+                        <option value="">Gave Birth</option>
+                        <option value="First Trimester">
+                          First Trimester (Weeks 1-12)
+                        </option>
+                        <option value="Second Trimester">
+                          Second Trimester (Weeks 13-26)
+                        </option>
+                        <option value="Third Trimester">
+                          Third Trimester (Weeks 27-40)
+                        </option>
+                      </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">

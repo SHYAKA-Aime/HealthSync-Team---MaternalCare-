@@ -7,8 +7,10 @@ bp = Blueprint('auth', __name__)
 
 @bp.route('/register', methods=['POST'])
 def register():
+    """Register a new user"""
     data = request.get_json()
     
+    # Validate required fields
     required_fields = ['full_name', 'email', 'password', 'role']
     is_valid, error_message = validate_required_fields(data, required_fields)
     if not is_valid:
@@ -71,35 +73,47 @@ def register():
 
 @bp.route('/login', methods=['POST'])
 def login():
-    """Login user"""
+    """Login user with email/password or phone/password"""
     data = request.get_json()
     
-    # Validate required fields
-    required_fields = ['email', 'password']
-    is_valid, error_message = validate_required_fields(data, required_fields)
-    if not is_valid:
-        return jsonify({'success': False, 'message': error_message}), 400
+    # Validate required fields - need either email or phone, plus password
+    if 'password' not in data or not data['password']:
+        return jsonify({'success': False, 'message': 'Password is required'}), 400
+    
+    if 'email' not in data and 'phone' not in data:
+        return jsonify({'success': False, 'message': 'Email or phone number is required'}), 400
+    
+    # Get the identifier (email or phone)
+    identifier = data.get('email') or data.get('phone')
+    if not identifier:
+        return jsonify({'success': False, 'message': 'Email or phone number is required'}), 400
     
     try:
         conn = Config.get_db_connection()
         cursor = conn.cursor()
         
-        # Get user by email
-        cursor.execute("""
-            SELECT user_id, full_name, email, password_hash, role, phone
-            FROM users WHERE email = %s
-        """, (data['email'],))
+        # Try to find user by email or phone
+        if data.get('email'):
+            cursor.execute("""
+                SELECT user_id, full_name, email, password_hash, role, phone
+                FROM users WHERE email = %s
+            """, (data['email'],))
+        else:
+            cursor.execute("""
+                SELECT user_id, full_name, email, password_hash, role, phone
+                FROM users WHERE phone = %s
+            """, (data['phone'],))
         
         user = cursor.fetchone()
         cursor.close()
         conn.close()
         
         if not user:
-            return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
+            return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
         
         # Verify password
         if not verify_password(data['password'], user['password_hash']):
-            return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
+            return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
         
         # Create token
         token = create_token(user['user_id'], user['role'])

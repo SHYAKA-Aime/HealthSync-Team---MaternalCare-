@@ -70,13 +70,13 @@ def create_mother():
     data = request.get_json()
     
     # Validate required fields
-    required_fields = ['user_id', 'pregnancy_stage', 'expected_delivery']
+    required_fields = ['user_id']
     is_valid, error_message = validate_required_fields(data, required_fields)
     if not is_valid:
         return jsonify({'success': False, 'message': error_message}), 400
     
-    # Validate date
-    if not validate_date(data['expected_delivery']):
+    # Validate date (ONLY if provided and not None)
+    if data.get('expected_delivery') and not validate_date(data['expected_delivery']):
         return jsonify({'success': False, 'message': 'Invalid date format. Use YYYY-MM-DD'}), 400
     
     try:
@@ -91,8 +91,8 @@ def create_mother():
             data['user_id'],
             data.get('age'),
             data.get('blood_group'),
-            data['pregnancy_stage'],
-            data['expected_delivery'],
+            data.get('pregnancy_stage'),
+            data.get('expected_delivery'),
             data.get('location'),
             data.get('medical_conditions'),
             data.get('emergency_contact')
@@ -123,6 +123,13 @@ def update_mother(mother_id):
         conn = Config.get_db_connection()
         cursor = conn.cursor()
         
+        # First, check if the mother exists
+        cursor.execute("SELECT mother_id FROM mothers WHERE mother_id = %s", (mother_id,))
+        if not cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'message': 'Mother not found'}), 404
+        
         # Build update query dynamically
         update_fields = []
         values = []
@@ -131,11 +138,22 @@ def update_mother(mother_id):
                          'location', 'medical_conditions', 'emergency_contact']
         
         for field in allowed_fields:
+            # Check if field exists in data (even if value is None)
             if field in data:
+                # Validate date fields if they have non-null values
+                if field == 'expected_delivery' and data[field]:
+                    if not validate_date(data[field]):
+                        cursor.close()
+                        conn.close()
+                        return jsonify({'success': False, 'message': 'Invalid expected_delivery date format. Use YYYY-MM-DD'}), 400
+                
                 update_fields.append(f"{field} = %s")
-                values.append(data[field])
+                # Allow None/null values to be set
+                values.append(data[field] if data[field] != '' else None)
         
         if not update_fields:
+            cursor.close()
+            conn.close()
             return jsonify({'success': False, 'message': 'No fields to update'}), 400
         
         values.append(mother_id)
@@ -143,9 +161,6 @@ def update_mother(mother_id):
         
         cursor.execute(query, values)
         conn.commit()
-        
-        if cursor.rowcount == 0:
-            return jsonify({'success': False, 'message': 'Mother not found'}), 404
         
         cursor.close()
         conn.close()
@@ -157,4 +172,3 @@ def update_mother(mother_id):
         
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
-
