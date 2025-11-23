@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { authService } from "../services/authService";
 import { getUser } from "../utils/auth";
 
 interface NavbarProps {
@@ -9,11 +8,11 @@ interface NavbarProps {
 const Navbar = ({ role }: NavbarProps) => {
   const user = getUser();
 
-  const handleLogout = () => {
-    if (confirm("Are you sure you want to logout?")) {
-      authService.logout();
-    }
-  };
+  // const handleLogout = () => {
+  //   if (confirm("Are you sure you want to logout?")) {
+  //     authService.logout();
+  //   }
+  // };
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-4">
